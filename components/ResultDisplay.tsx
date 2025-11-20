@@ -135,3 +135,4 @@ export const ResultDisplay: React.FC<Props> = ({
     </div>
   );
 };
+export default ResultDisplay;
