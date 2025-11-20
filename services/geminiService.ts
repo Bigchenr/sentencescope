@@ -1,7 +1,7 @@
 // src/services/geminiService.ts
 import type { AnalysisResult } from "../types";
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const API_KEY = import.VITE_GEMINI_API_KEY;
 
 if (!API_KEY) {
   console.error("❌ 缺少 VITE_GEMINI_API_KEY 环境变量");
