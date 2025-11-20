@@ -14,3 +14,29 @@ body {
 #root {
   min-height: 100vh;
 }
+/* 保证整个应用内容清晰可见 */
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+/* 所有卡片：白底、不透明、深色文字 */
+.card,
+.result-card,
+textarea,
+button {
+  opacity: 1 !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+/* 错误信息区域的文字加强对比 */
+.error-text {
+  color: #111827 !important;
+}
