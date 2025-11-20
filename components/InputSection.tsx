@@ -1,66 +1,61 @@
-import React, { useState } from 'react';
-import Button from './Button';
-import { EXAMPLE_SENTENCES } from '../constants';
+import React from "react";
+import { SAMPLE_SENTENCES } from "../constants";
+import { Button } from "./Button";
 
-interface InputSectionProps {
-  onAnalyze: (sentence: string) => void;
-  isAnalyzing: boolean;
+interface Props {
+  value: string;
+  onChange: (val: string) => void;
+  onAnalyze: () => void;
+  loading: boolean;
+  setError: (msg: string | null) => void;
 }
 
-const InputSection: React.FC<InputSectionProps> = ({ onAnalyze, isAnalyzing }) => {
-  const [input, setInput] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (input.trim()) {
-      onAnalyze(input);
-    }
+export const InputSection: React.FC<Props> = ({
+  value,
+  onChange,
+  onAnalyze,
+  loading,
+  setError,
+}) => {
+  const handleExampleClick = (s: string) => {
+    onChange(s);
+    setError(null);
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 md:p-8">
-        <div className="mb-4">
-          <label htmlFor="sentence-input" className="block text-sm font-semibold text-slate-700 mb-2">
-            Enter English Sentence
-          </label>
-          <textarea
-            id="sentence-input"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="e.g., The success of this project depends on our ability to collaborate effectively..."
-            className="w-full h-32 px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 transition-all resize-none text-lg leading-relaxed"
-            disabled={isAnalyzing}
-          />
-        </div>
-
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
-            {EXAMPLE_SENTENCES.map((ex, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setInput(ex)}
-                className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors truncate max-w-[200px]"
-                title={ex}
-              >
-                Example {i + 1}
-              </button>
-            ))}
-          </div>
-          
-          <Button 
-            type="submit" 
-            disabled={!input.trim() || isAnalyzing} 
-            isLoading={isAnalyzing}
-            className="w-full md:w-auto min-w-[120px]"
+    <div className="card">
+      <h2>输入英文句子 / Input Sentence</h2>
+      <textarea
+        className="sentence-input"
+        rows={6}
+        placeholder="在这里输入你想分析的英文长难句……"
+        value={value}
+        onChange={(e) => {
+          onChange(e.target.value);
+          setError(null);
+        }}
+      />
+      <div className="input-actions">
+        <Button onClick={onAnalyze} disabled={loading}>
+          {loading ? "正在分析…" : "开始分析"}
+        </Button>
+      </div>
+      <div className="examples">
+        <span className="examples-title">示例：</span>
+        {SAMPLE_SENTENCES.map((s, idx) => (
+          <button
+            key={idx}
+            type="button"
+            className="example-chip"
+            onClick={() => handleExampleClick(s)}
           >
-            Analyze
-          </Button>
-        </div>
-      </form>
+            Example {idx + 1}
+          </button>
+        ))}
+      </div>
+      <p className="input-tip">
+        💡 建议从课本、真题、外刊里挑句子，逐句精读，长期坚持就是你的「长难句语料库」。
+      </p>
     </div>
   );
 };
-
-export default InputSection;
