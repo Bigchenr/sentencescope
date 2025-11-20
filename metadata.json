@@ -1,0 +1,5 @@
+{
+  "name": "SentenceScope",
+  "description": "An advanced English sentence analysis engine for students, powered by Gemini.",
+  "requestFramePermissions": []
+}
