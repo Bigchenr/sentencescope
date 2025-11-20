@@ -1,24 +1,24 @@
-import { GoogleAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { AnalysisResult } from "../types";
 
-const client = new GoogleAI({
-  apiKey: import.meta.env.GEMINI_API_KEY
-});
+const genAI = new GoogleGenerativeAI(import.meta.env.GEMINI_API_KEY);
 
 export async function analyzeSentence(sentence: string): Promise<AnalysisResult> {
   try {
-    const model = client.getGenerativeModel({
-      model: "gemini-2.0-flash"
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
     });
 
-    const result = await model.generateText({
-      prompt: `Analyze this English sentence and return a JSON structure:\n${sentence}`
-    });
+    const result = await model.generateContent(`
+      Analyze this English sentence and return a JSON object:
+      ${sentence}
+    `);
 
-    const text = result.text();
+    const text = result.response.text();
     return JSON.parse(text);
-  } catch (error) {
-    console.error("Gemini request failed:", error);
-    throw new Error("AI request failed.");
+
+  } catch (e) {
+    console.error("Gemini request failed:", e);
+    throw new Error("AI request failed");
   }
 }
