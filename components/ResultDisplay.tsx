@@ -1,93 +1,137 @@
-import React, { useMemo } from 'react';
-import { AnalysisSection } from '../types';
-import AnalysisSectionCard from './AnalysisSectionCard';
+import React from "react";
+import type { AnalysisResult } from "../types";
+import { AnalysisSectionCard } from "./AnalysisSectionCard";
 
-interface ResultDisplayProps {
-  rawResult: string;
+interface Props {
+  result: AnalysisResult | null;
+  loading: boolean;
+  error: string | null;
 }
 
-const ResultDisplay: React.FC<ResultDisplayProps> = ({ rawResult }) => {
-  
-  const parsedSections = useMemo(() => {
-    // Regex to split by the specific numbered markers used in the prompt
-    // ①, ②, ... ⑪
-    const markers = [
-      '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩', '⑪'
-    ];
-    
-    const sections: AnalysisSection[] = [];
-    let currentText = rawResult;
-    
-    // Find indices of all markers
-    const indices = markers.map(marker => ({
-      marker,
-      index: currentText.indexOf(marker)
-    })).filter(item => item.index !== -1).sort((a, b) => a.index - b.index);
-
-    for (let i = 0; i < indices.length; i++) {
-      const current = indices[i];
-      const next = indices[i + 1];
-      
-      const start = current.index;
-      const end = next ? next.index : currentText.length;
-      
-      const fullSectionText = currentText.substring(start, end).trim();
-      
-      // Split title (first line usually) and content
-      const firstLineEnd = fullSectionText.indexOf('\n');
-      let title = '';
-      let content = '';
-
-      if (firstLineEnd !== -1) {
-        title = fullSectionText.substring(0, firstLineEnd).trim();
-        content = fullSectionText.substring(firstLineEnd).trim();
-      } else {
-        title = fullSectionText; // Fallback if no newline
-      }
-
-      // Clean up title if it contains the marker but no brackets (though prompt says 【...】)
-      // The prompt asks for ①【Title】.
-      
-      sections.push({
-        id: i + 1,
-        title,
-        content
-      });
-    }
-
-    return sections;
-  }, [rawResult]);
-
-  if (parsedSections.length === 0) {
-     // Fallback for when the AI output format is slightly off but still contains text
-     return (
-       <div className="bg-white rounded-xl shadow p-6 whitespace-pre-wrap font-sans text-slate-700">
-         {rawResult}
-       </div>
-     );
+export const ResultDisplay: React.FC<Props> = ({
+  result,
+  loading,
+  error,
+}) => {
+  if (loading) {
+    return (
+      <div className="card">
+        <p>正在调用 Gemini 分析句子，请稍候……</p>
+      </div>
+    );
   }
 
+  if (error) {
+    return (
+      <div className="card error-card">
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  if (!result) {
+    return (
+      <div className="card">
+        <p>左侧输入句子并点击「开始分析」，这里会展示详细分析结果。</p>
+      </div>
+    );
+  }
+
+  const stars = "★".repeat(result.difficulty) + "☆".repeat(5 - result.difficulty);
+
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 pb-20 animate-fade-in">
-       <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-slate-800">Analysis Result</h2>
-          <span className="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
-            Powered by Gemini 2.5 Flash
-          </span>
-       </div>
-       
-       <div className="grid grid-cols-1 gap-6">
-         {parsedSections.map((section) => (
-           <AnalysisSectionCard 
-             key={section.id}
-             index={section.id}
-             title={section.title}
-             content={section.content}
-           />
-         ))}
-       </div>
+    <div className="result-grid">
+      <AnalysisSectionCard title="① 原句">
+        <p className="mono">{result.original}</p>
+      </AnalysisSectionCard>
+
+      <AnalysisSectionCard title="② 语法主干">
+        <p className="mono highlight">{result.mainClause}</p>
+        <p className="muted">结构骨架：{result.grammarCore}</p>
+      </AnalysisSectionCard>
+
+      <AnalysisSectionCard title="③ 从属成分拆解">
+        <ul className="list">
+          {result.components.map((c, idx) => (
+            <li key={idx}>
+              <strong>{c.label}：</strong>
+              <span className="mono">{c.content}</span>
+              <div className="muted">{c.explanation}</div>
+            </li>
+          ))}
+        </ul>
+      </AnalysisSectionCard>
+
+      <AnalysisSectionCard title="④ 逻辑关系分析">
+        <ul className="list">
+          {result.logicRelations.map((l, idx) => (
+            <li key={idx}>{l}</li>
+          ))}
+        </ul>
+      </AnalysisSectionCard>
+
+      <AnalysisSectionCard title="⑤ 句法树可视化">
+        <pre className="syntax-tree">{result.syntaxTree}</pre>
+      </AnalysisSectionCard>
+
+      <AnalysisSectionCard title="⑥ 英文简化版">
+        <p className="mono">{result.simplifiedEnglish}</p>
+      </AnalysisSectionCard>
+
+      <AnalysisSectionCard title="⑦ 中文解释">
+        <p>{result.chineseExplanation}</p>
+      </AnalysisSectionCard>
+
+      <AnalysisSectionCard title="⑧ 句子难度等级">
+        <p>
+          难度：<span className="stars">{stars}</span>{" "}
+          <span className="muted">(1 = 入门，5 = 地狱长难句)</span>
+        </p>
+      </AnalysisSectionCard>
+
+      <AnalysisSectionCard title="⑨ 考试高频考点总结">
+        <ul className="list">
+          {result.examPoints.map((p, idx) => (
+            <li key={idx}>{p}</li>
+          ))}
+        </ul>
+      </AnalysisSectionCard>
+
+      <AnalysisSectionCard title="⑩ 同类型例句">
+        <ul className="list">
+          {result.similarSentences.map((s, idx) => (
+            <li key={idx} className="mono">
+              {s}
+            </li>
+          ))}
+        </ul>
+      </AnalysisSectionCard>
+
+      <AnalysisSectionCard title="⑪ 仿真考试题（可用于课堂）">
+        <ol className="list">
+          {result.practiceQuestions.map((q, idx) => (
+            <li key={idx}>
+              <strong>
+                [{q.type === "grammar" ? "语法选择" : "翻译"}]
+              </strong>{" "}
+              {q.question}
+              {q.options && (
+                <ul className="options">
+                  {q.options.map((o, i) => (
+                    <li key={i}>{o}</li>
+                  ))}
+                </ul>
+              )}
+              {q.answer && (
+                <div className="muted">参考答案：{q.answer}</div>
+              )}
+              {q.explanation && (
+                <div className="muted">解析：{q.explanation}</div>
+              )}
+            </li>
+          ))}
+        </ol>
+      </AnalysisSectionCard>
     </div>
   );
 };
-
-export default ResultDisplay;
