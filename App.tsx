@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import InputSection from "./components/InputSection";
-import ResultDisplay from "./components/ResultDisplay";
+import { InputSection } from "./components/InputSection";
+import { ResultDisplay } from "./components/ResultDisplay";
 
 
 const App: React.FC = () => {
