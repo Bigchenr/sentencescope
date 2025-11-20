@@ -23,7 +23,15 @@ export const InputSection: React.FC<Props> = ({
   };
 
   return (
-    <div className="card">
+   <div
+  className="card"
+  style={{
+    maxWidth: "700px",
+    width: "90%",
+    margin: "0 auto",
+  }}
+>
+
       <h2>输入英文句子 / Input Sentence</h2>
       <textarea
         className="sentence-input"
