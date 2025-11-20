@@ -12,8 +12,9 @@ export async function analyzeSentence(sentence: string): Promise<AnalysisResult>
   }
 
   const url =
-    "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=" +
-    API_KEY;
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" +
+  API_KEY;
+
 
   const prompt = `
 你是一位面向中国中学生和高中生的英语长难句分析老师。
