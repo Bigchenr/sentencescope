@@ -69,3 +69,4 @@ export const InputSection: React.FC<Props> = ({
     </div>
   );
 };
+export default InputSection;
