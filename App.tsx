@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import InputSection from "./components/InputSection";
 import ResultDisplay from "./components/ResultDisplay";
-import ExampleSection from "./components/ExampleSection";
+
 
 const App: React.FC = () => {
   const [input, setInput] = useState("");
@@ -24,7 +24,7 @@ const App: React.FC = () => {
 
       <InputSection input={input} setInput={setInput} />
       <ResultDisplay result={result} />
-      <ExampleSection setInput={setInput} />
+      
     </div>
   );
 };
