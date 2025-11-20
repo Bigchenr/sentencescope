@@ -33,9 +33,11 @@ export const InputSection: React.FC<Props> = ({
 >
 
       <h2>输入英文句子 / Input Sentence</h2>
-      <textarea
-        className="sentence-input"
-        rows={6}
+     <textarea
+  className="sentence-input"
+  rows={6}
+  style={{ width: "100%" }}
+
         placeholder="在这里输入你想分析的英文长难句……"
         value={value}
         onChange={(e) => {
